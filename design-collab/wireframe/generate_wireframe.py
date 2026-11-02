@@ -65,6 +65,8 @@ label.card:hover,label.btn:hover{filter:brightness(0.97)}
 .send-row{display:flex;align-items:center;gap:8px}
 .send-row .input{min-height:40px;padding:9px 14px;border-radius:999px}
 .send-btn{width:40px;height:40px;border-radius:50%;background:#343a40;color:#fff;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;user-select:none}
+.send-btn.off{background:#ced4da;color:#868e96;cursor:default}
+.input:disabled{background:#f1f3f5;color:#868e96}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hl{background:#ffec99;border-radius:3px;padding:0 2px;font-weight:700}
 .bub{max-width:78%;padding:10px 12px;border-radius:14px;font-size:13px}
@@ -191,8 +193,10 @@ def chat_base(extra=""):
 
 
 def input_bar(disabled=False):
-    return f"""<div class="row"><div class="input" style="flex:1;{'background:#f1f3f5;' if disabled else ''}">{'답을 기다리는 중…' if disabled else '아이에게 말해 보세요'}</div>
-<div class="btn s g">마이크</div><div class="btn s{' off' if disabled else ''}">보내기</div></div>"""
+    ph_text = "답을 기다리는 중…" if disabled else "아이에게 말해 보세요"
+    dis = " disabled" if disabled else ""
+    btn_cls = "send-btn off" if disabled else "send-btn"
+    return f"""<div class="send-row"><input type="text" class="input" placeholder="{ph_text}"{dis}><div class="{btn_cls}" title="보내기">➤</div></div>"""
 
 
 SCREENS = []  # (menu, id, name, html)
@@ -521,7 +525,9 @@ add(M_F, "F-5", "대화 중 피드백",
 <div class="bub me">좋아하는 거 보면 마음이 {W}을 해.</div>
 {banner("의미는 잘 전달됐어요! 표현 하나만 다듬어볼까요?", "ok")}
 {card(f'<h4>이 부분만 살짝</h4><div>뜻은 정확해요! 상황에 맞는 표현을 잘 골랐어요.</div><div class="muted" style="margin-top:6px">"{W}해"라고 이어서 말하면 더 자연스러워요.</div>')}
-<div class="sp"></div><div class="row"><div style="flex:1">{btn("다시 답변하기", "F-2", "g")}</div><div style="flex:1">{btn("대화 계속 보기", "F-3")}</div></div>""",
+<div class="sp"></div>
+<div class="send-row"><input type="text" class="input" placeholder="다시 답해 보세요"><label class="send-btn" for="go-F-4" title="보내기">➤</label></div>
+{btn("대화 계속 보기", "F-3", "o")}""",
     title=f"{CHILD}과 대화", back=True, back_to="F-2")
 
 add(M_F, "F-6", "대화 마무리",

@@ -48,6 +48,8 @@ label.card:hover,label.btn:hover{filter:brightness(0.97)}
 .send-row{display:flex;align-items:center;gap:8px}
 .send-row .input{min-height:40px;padding:9px 14px;border-radius:999px}
 .send-btn{width:40px;height:40px;border-radius:50%;background:#343a40;color:#fff;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;user-select:none}
+.send-btn.off{background:#ced4da;color:#868e96;cursor:default}
+.input:disabled{background:#f1f3f5;color:#868e96}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hl{background:#ffec99;border-radius:3px;padding:0 2px;font-weight:700}
 .bub{max-width:78%;padding:10px 12px;border-radius:14px;font-size:13px}
@@ -278,8 +280,7 @@ th{background:#f1f3f5}
 <div class="bub ai"><div class="who">민준 (AI 역할)</div>아빠! 토끼가 당근 봤어. 토끼 가슴이 막 뛰어!</div>
 <div class="bub me">토끼가 왜 두근두근할까?</div>
 <div class="bub ai"><div class="who">민준</div>당근이 너무 좋아서! 나도 두근두근!</div>
-<div class="bub ai"><div class="dots"><span></span><span></span><span></span></div></div><div class="sp"></div><div class="row"><div class="input" style="flex:1;background:#f1f3f5;">답을 기다리는 중…</div>
-<div class="btn s g">마이크</div><div class="btn s off">보내기</div></div><div class="row" style="justify-content:center"><label class="btn s" for="go-F-3">문제 없음</label><label class="btn s" for="go-F-5">문제 있음 (피드백 보기)</label></div></div></div>
+<div class="bub ai"><div class="dots"><span></span><span></span><span></span></div></div><div class="sp"></div><div class="send-row"><input type="text" class="input" placeholder="답을 기다리는 중…" disabled><div class="send-btn off" title="보내기">➤</div></div><div class="row" style="justify-content:center"><label class="btn s" for="go-F-3">문제 없음</label><label class="btn s" for="go-F-5">문제 있음 (피드백 보기)</label></div></div></div>
 </div></section><section id="F-5" class="scr"><div class="stage">
 <div class="phone"><div class="status"><span>9:41</span><span>● ● ▮</span></div><div class="hdr"><label class="back" for="go-F-2">‹</label>민준과 대화</div>
 <div class="content"><div class="row"><span class="chip">오늘의 표현 · 두근두근</span><span class="chip on">2세트 · 피드백</span></div>
@@ -289,7 +290,9 @@ th{background:#f1f3f5}
 <div class="bub me">좋아하는 거 보면 마음이 두근두근을 해.</div>
 <div class="banner ok">의미는 잘 전달됐어요! 표현 하나만 다듬어볼까요?</div>
 <div class="card"><h4>이 부분만 살짝</h4><div>뜻은 정확해요! 상황에 맞는 표현을 잘 골랐어요.</div><div class="muted" style="margin-top:6px">"두근두근해"라고 이어서 말하면 더 자연스러워요.</div></div>
-<div class="sp"></div><div class="row"><div style="flex:1"><label class="btn g" for="go-F-2">다시 답변하기</label></div><div style="flex:1"><label class="btn " for="go-F-3">대화 계속 보기</label></div></div></div></div>
+<div class="sp"></div>
+<div class="send-row"><input type="text" class="input" placeholder="다시 답해 보세요"><label class="send-btn" for="go-F-4" title="보내기">➤</label></div>
+<label class="btn o" for="go-F-3">대화 계속 보기</label></div></div>
 </div></section><section id="F-6" class="scr"><div class="stage">
 <div class="phone"><div class="status"><span>9:41</span><span>● ● ▮</span></div><div class="hdr">대화 마무리</div>
 <div class="content"><div class="sp"></div><div class="ph" style="height:90px"><span>완료 일러스트</span></div><div class="big" style="text-align:center;font-size:17px">오늘 대화 잘했어요!</div>
