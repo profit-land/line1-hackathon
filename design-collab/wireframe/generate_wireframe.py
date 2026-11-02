@@ -510,8 +510,7 @@ add(M_F, "F-3", "1단계 대화 (완료)",
 add(M_F, "F-4", "AI 응답 대기 (로딩)",
     f"{CHILD} 역할의 AI가 부모의 답변을 받아 다음 발화를 준비하는 동안의 로딩 상태",
     "F-2 '답변 보내기'", ["문제 없이 진행 → F-3 (완료)", "답변에 문제 있음 → F-5 (피드백)", "뒤로 → F-2"],
-    chat_base('<div class="bub ai"><div class="dots"><span></span><span></span><span></span></div></div>') + input_bar(True)
-    + f'<div class="row" style="justify-content:center">{btn("문제 없음", "F-3", "s")}{btn("문제 있음 (피드백 보기)", "F-5", "s")}</div>',
+    chat_base('<div class="bub ai"><div class="dots"><span></span><span></span><span></span></div></div>') + input_bar(True),
     title=f"{CHILD}과 대화", right="입력 잠금", back=True, back_to="F-2")
 
 add(M_F, "F-5", "대화 중 피드백",
@@ -526,8 +525,7 @@ add(M_F, "F-5", "대화 중 피드백",
 {banner("의미는 잘 전달됐어요! 표현 하나만 다듬어볼까요?", "ok")}
 {card(f'<h4>이 부분만 살짝</h4><div>뜻은 정확해요! 상황에 맞는 표현을 잘 골랐어요.</div><div class="muted" style="margin-top:6px">"{W}해"라고 이어서 말하면 더 자연스러워요.</div>')}
 <div class="sp"></div>
-<div class="send-row"><input type="text" class="input" placeholder="다시 답해 보세요"><label class="send-btn" for="go-F-4" title="보내기">➤</label></div>
-{btn("대화 계속 보기", "F-3", "o")}""",
+<div class="send-row"><input type="text" class="input" placeholder="다시 답해 보세요"><label class="send-btn" for="go-F-4" title="보내기">➤</label></div>""",
     title=f"{CHILD}과 대화", back=True, back_to="F-2")
 
 add(M_F, "F-6", "대화 마무리",
