@@ -84,13 +84,6 @@ th{background:#f1f3f5}
 .bm-corner{position:absolute;top:8px;right:8px}
 .floatbar{position:sticky;bottom:-16px;left:0;right:0;margin:4px -16px -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid #dee2e6}
 .floatbar .btn{padding:14px}
-.note{width:270px;max-height:780px;overflow-y:auto;background:#fff;border:1px solid #ced4da;border-radius:12px;padding:16px;position:sticky;top:20px;font-size:12px;color:#495057}
-.note .id{display:inline-block;background:#343a40;color:#fff;border-radius:6px;padding:2px 8px;font-weight:700;font-size:12px}
-.note h3{font-size:15px;margin:8px 0 10px;color:#212529}
-.note dt{font-weight:700;margin-top:8px;color:#212529}
-.note dd{margin-left:0}
-.note ul{margin:4px 0 0 16px}
-@media(max-width:720px){.note{display:none}}
 """
 
 TABS = ["홈", "단어 탐색", "복습", "내 정보"]
@@ -158,16 +151,9 @@ def screen(sid, name, purpose, enter, goes, body, tab=None, title=None, back=Fal
             f'<label class="tabitem{" on" if t == tab else ""}" for="go-{_reg(TAB_TARGET[t])}"><i></i>{t}</label>'
             for t in TABS)
         tabbar = f'<div class="tabbar">{items}</div>'
-    st = ""
-    if status:
-        lis = "".join(f"<li>{s}</li>" for s in status)
-        st = f"<dt>화면 상태 / 예외</dt><dd><ul>{lis}</ul></dd>"
-    go_html = "".join(f"<li>{g}</li>" for g in goes)
     return f"""<section id="{sid}" class="scr"><div class="stage">
 <div class="phone"><div class="status"><span>9:41</span><span>● ● ▮</span></div>{hdr}
 <div class="content">{body}</div>{tabbar}</div>
-<aside class="note"><span class="id">{sid}</span><h3>{name}</h3>
-<dl><dt>목적</dt><dd>{purpose}</dd><dt>진입</dt><dd>{enter}</dd><dt>이동</dt><dd><ul>{go_html}</ul></dd>{st}</dl></aside>
 </div></section>"""
 
 
