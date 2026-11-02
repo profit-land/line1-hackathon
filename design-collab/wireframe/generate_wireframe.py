@@ -62,6 +62,9 @@ label.card:hover,label.btn:hover{filter:brightness(0.97)}
 .input{border:1.5px solid #adb5bd;border-radius:10px;padding:12px;color:#212529;background:#fff;min-height:44px;width:100%;font-family:inherit;font-size:14px}
 .input.ta{min-height:110px;resize:vertical}
 .input::placeholder{color:#868e96}
+.send-row{display:flex;align-items:center;gap:8px}
+.send-row .input{min-height:40px;padding:9px 14px;border-radius:999px}
+.send-btn{width:40px;height:40px;border-radius:50%;background:#343a40;color:#fff;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;user-select:none}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hl{background:#ffec99;border-radius:3px;padding:0 2px;font-weight:700}
 .bub{max-width:78%;padding:10px 12px;border-radius:14px;font-size:13px}
@@ -479,8 +482,8 @@ add(M_F, "F-2", "대화 화면 (대화 중)",
 <div class="bub me">맞아, 토끼 마음이 {W}했을 것 같아!</div>
 <div class="bub ai"><div class="who">{CHILD} (아이)</div>근데 {W}이 뭐야?</div>
 {card('<div class="h" style="margin:0">💡 도움말</div><div class="muted" style="margin-top:4px">책 장면과 연결해 쉬운 말로 뜻을 설명해보세요.</div>')}
-<textarea class="input ta" placeholder="여기에 답해 보세요"></textarea>
-<div class="sp"></div>{btn("답변 보내기", "F-4")}""",
+<div class="sp"></div>
+<div class="send-row"><input type="text" class="input" placeholder="여기에 답해 보세요"><label class="send-btn" for="go-F-4" title="보내기">➤</label></div>""",
     title=f"{CHILD}과 대화", back=True, back_to="F-1")
 
 add(M_F, "F-3", "1단계 대화 (완료)",
