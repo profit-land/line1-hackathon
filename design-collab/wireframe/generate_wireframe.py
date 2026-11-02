@@ -458,88 +458,79 @@ add(M_E, "E-4", "AI 피드백 (자연스러운 문장)",
 
 # ── F 대화 연습 ─────────────────────────────────────────────────────────────
 add(M_F, "F-1", "대화 연습 준비",
-    "오늘의 목표를 먼저 확인하고 1단계부터 순서대로 진행. 2단계는 1단계를 마쳐야 열림",
+    "오늘의 목표만 확인하고 바로 대화 시작 (2단계 삭제 — 1단계 단일 흐름)",
     "C-7 단어 카드 목록 '아이와 대화 연습하기' 하단 고정 버튼에서 진입",
-    ["1단계 시작 → F-2 (동화책 기반 대화)", "2단계는 1단계 완료 후 F-6에서 진행", "뒤로 → C-7 단어 카드 목록"],
+    ["대화 시작 → F-2", "뒤로 → C-7 단어 카드 목록"],
     f"""<div class="h">오늘의 목표</div>
 {card(f'<span class="chip on">{W}</span> 을(를) 넣어 아이에게 질문해 보기')}
-<div class="h">대화 단계</div>
-{card(f'<div class="row"><span class="chip on">1단계</span><h4 style="margin:0">책 읽고 대화하기</h4></div><div class="muted">그림책 속 토끼 이야기 · 4회 대화</div>', "F-2", sel=True)}
-<div class="card" style="opacity:.55">
-<div class="row"><span class="chip">2단계</span><h4 style="margin:0">🔒 대화 확장하기</h4></div>
-<div class="muted">우리 집 일상 장면 · 5회 대화 · 1단계를 완료하면 열려요</div>
-</div>
-<div class="sp"></div>{btn("1단계 대화 시작하기", "F-2")}""",
-    title="아이와 대화 연습", back=True, back_to="C-7",
-    status=["캐릭터 사진·'토리와 이야기해요' 소개 카드 제거", "오늘의 목표를 화면 최상단으로 이동",
-            "입력 방법(글/음성) 태그 제거", "'그림책 속 토끼 이야기'=1단계, '우리 집 일상 장면'=2단계로 전환, 2단계는 잠금 표시",
-            "진입은 단어 카드 목록(C-7) 하단 고정 버튼에서만 — D-1 단어 상세에는 진입 버튼 없음"])
+<div class="sp"></div>{btn("대화 시작하기", "F-2")}""",
+    title="아이와 대화 연습", back=True, back_to="C-7")
 
-add(M_F, "F-2", "1단계 대화 (책 읽고 대화하기)",
-    f"그림책 장면을 소재로 부모·{CHILD}(AI, 아이 역할)가 각 4회씩 총 8개 발화를 주고받는 대화. 끝나면 자동 종료 후 2단계로 이어짐",
-    "F-1 '1단계 대화 시작하기'",
-    ["8개 발화 완료 시 자동 종료 → F-6 (2단계)", "답변 대기 → F-3", "입력 실패 → F-4"],
-    f"""<div class="row"><span class="chip">오늘의 표현 · {W}</span><span class="chip on">1단계</span></div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>민준아, 토끼가 당근을 보고 있어! 토끼 기분이 어땠을까?</div>
-<div class="bub me">토끼는 당근을 보고 가슴이 {W}했대!</div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>{W}이 뭐야? 엄마!</div>
-<div class="bub me">좋아하는 걸 보거나 설렐 때 마음이 자꾸 세게 뛰는 거야.</div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>오, 그럼 나도 좋아하는 거 보면 {W}하는 거야?</div>
-<div class="bub me">맞아! 선물 받을 때나 소풍 가기 전에도 마음이 {W}해.</div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>나도 생일 선물 받을 때 {W}했었어!</div>
-<div class="bub me">맞아, 그럴 때 "마음이 {W}해"라고 말하는 거야!</div>
-{banner("1단계 대화를 모두 마쳤어요 (8개 발화 완료) — 대화가 자동으로 종료돼요", "ok")}
-<div class="floatbar">{btn("2단계 대화 시작하기 →", "F-6")}</div>""",
-    title=f"{CHILD}과 대화 · 1단계", back=True, back_to="F-1")
+add(M_F, "F-2", "대화 화면 (대화 중)",
+    f"1단계 대화(AI 4회+부모 4회=8발화) 진행 중, 2세트째에 부모가 답할 수 있도록 도움말을 보여주는 장면. "
+    "진행 방식 — ①아이가 책 속 장면을 보고 자기 생각을 말하면 부모는 그 생각을 받아주며 학습 단어를 넣어 말한다 "
+    "②아이가 단어 뜻을 물으면 부모는 책 장면과 연결해 쉬운 말로 설명한다 "
+    "③아이가 자신의 익숙한 경험을 말하면 부모는 그 경험을 인정하고 학습 단어를 넣어 다시 말한다 "
+    "④아이가 다른 일상 상황을 말하면 부모는 학습 단어를 적용해 책 속 장면과 다시 연결한다",
+    "F-1 '대화 시작하기' / F-5에서 '다시 답변하기'",
+    ["답변 보내기 → F-4 (로딩)", "뒤로 → F-1"],
+    f"""<div class="row"><span class="chip">오늘의 표현 · {W}</span><span class="chip on">2세트 · 도움말</span></div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>토끼가 당근을 보고 가슴이 콩닥콩닥할 것 같아!</div>
+<div class="bub me">맞아, 토끼 마음이 {W}했을 것 같아!</div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>근데 {W}이 뭐야?</div>
+{card('<div class="h" style="margin:0">💡 도움말</div><div class="muted" style="margin-top:4px">책 장면과 연결해 쉬운 말로 뜻을 설명해보세요.</div>')}
+<textarea class="input ta" placeholder="여기에 답해 보세요"></textarea>
+<div class="sp"></div>{btn("답변 보내기", "F-4")}""",
+    title=f"{CHILD}과 대화", back=True, back_to="F-1")
 
-add(M_F, "F-3", "AI 응답 대기 (로딩)",
-    f"{CHILD} 역할의 AI가 답하는 동안 상태 표시 (1단계·2단계 공통)", "F-2 또는 F-6에서 보내기", ["응답 도착 → F-2/F-6", "지연·오류 → Z-2"],
+add(M_F, "F-3", "1단계 대화 (완료)",
+    f"AI 4회, 부모 4회로 총 8번의 대화를 주고받은 완료 상태. 각 발화는 F-2(대화 화면·대화 중)의 진행 방식을 그대로 따른다",
+    "F-4 로딩 완료 후 (문제 없이 4세트까지 끝났을 때) / F-5에서 '대화 계속 보기'",
+    ["대화 마무리 보기 → F-6", "뒤로 → F-2"],
+    f"""<div class="row"><span class="chip">오늘의 표현 · {W}</span><span class="chip on">1단계 · 완료</span></div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>토끼가 당근을 보고 가슴이 콩닥콩닥할 것 같아!</div>
+<div class="bub me">맞아, 토끼 마음이 {W}했을 것 같아!</div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>근데 {W}이 뭐야?</div>
+<div class="bub me">좋아하는 걸 보면 마음이 자꾸 뛰는 거야. 토끼도 당근을 보고 그랬을 거야.</div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>나도 생일 선물 받을 때 그랬어!</div>
+<div class="bub me">맞아! 그때 민준이 마음도 {W}했겠다.</div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>내일 소풍 가는 것도 {W}해!</div>
+<div class="bub me">토끼가 당근 보고 {W}한 것처럼, 민준이도 소풍 생각하면 {W}하지?</div>
+{banner("1단계 대화를 모두 마쳤어요 (8개 발화 완료)", "ok")}
+<div class="floatbar">{btn("대화 마무리 보기 →", "F-6")}</div>""",
+    title=f"{CHILD}과 대화", back=True, back_to="F-2")
+
+add(M_F, "F-4", "AI 응답 대기 (로딩)",
+    f"{CHILD} 역할의 AI가 부모의 답변을 받아 다음 발화를 준비하는 동안의 로딩 상태",
+    "F-2 '답변 보내기'", ["문제 없이 진행 → F-3 (완료)", "답변에 문제 있음 → F-5 (피드백)", "뒤로 → F-2"],
     chat_base('<div class="bub ai"><div class="dots"><span></span><span></span><span></span></div></div>') + input_bar(True)
-    + f'<div class="row" style="justify-content:center">{btn("응답 도착 (시연)", "F-2", "s")}</div>',
-    title=f"{CHILD}과 대화", right="입력 잠금", status=[f"{CHILD} 입력 중 표시", "입력창 비활성", "F-2/F-6 공통 로딩 상태"])
+    + f'<div class="row" style="justify-content:center">{btn("문제 없음", "F-3", "s")}{btn("문제 있음 (피드백 보기)", "F-5", "s")}</div>',
+    title=f"{CHILD}과 대화", right="입력 잠금", back=True, back_to="F-2")
 
-add(M_F, "F-4", "입력 · 응답 예외",
-    "음성 인식 실패, 응답 오류 시 복구 경로 제공 (1단계·2단계 공통)", "F-2/F-6에서 음성 입력 실패 / AI 응답 오류",
-    ["다시 말하기 / 글로 쓰기 → F-2", "다시 보내기 → F-3"],
-    f"""<div class="h">상태 ① 음성 인식 실패</div>
-{banner("잘 듣지 못했어요. 다시 말하거나 글로 써 주세요.", "warn")}
-<div class="row"><div style="flex:1">{btn("다시 말하기", "F-2", "g")}</div><div style="flex:1">{btn("글로 쓰기", "F-2", "g")}</div></div>
-<div class="h">상태 ② {CHILD} 응답 오류</div>
-<div class="bub me">토끼가 왜 {W}할까?</div>
-{banner(f"{CHILD}이(가) 대답하지 못했어요.", "warn")}{btn("다시 보내기", "F-3")}""",
-    title=f"{CHILD}과 대화", back=True, back_to="F-2", status=["음성 인식 실패", "AI 응답 오류", "F-2/F-6 공통"])
+add(M_F, "F-5", "대화 중 피드백",
+    "부모가 2번째 응답(2세트 답변)을 보낸 뒤, 그 답변에 문제가 있을 경우 대화창 안에서 바로 보여주는 피드백. "
+    "E-3과 같은 원칙 — 의미 전달을 먼저 인정하고 문법 용어 없이 1개만 자연스럽게 짚는다",
+    "F-4 '문제 있음' (2세트 답변 전송 직후)", ["다시 답변하기 → F-2", "대화 계속 보기 → F-3"],
+    f"""<div class="row"><span class="chip">오늘의 표현 · {W}</span><span class="chip on">2세트 · 피드백</span></div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>토끼가 당근을 보고 가슴이 콩닥콩닥할 것 같아!</div>
+<div class="bub me">맞아, 토끼 마음이 {W}했을 것 같아!</div>
+<div class="bub ai"><div class="who">{CHILD} (아이)</div>근데 {W}이 뭐야?</div>
+<div class="bub me">좋아하는 거 보면 마음이 {W}을 해.</div>
+{banner("의미는 잘 전달됐어요! 표현 하나만 다듬어볼까요?", "ok")}
+{card(f'<h4>이 부분만 살짝</h4><div>뜻은 정확해요! 상황에 맞는 표현을 잘 골랐어요.</div><div class="muted" style="margin-top:6px">"{W}해"라고 이어서 말하면 더 자연스러워요.</div>')}
+<div class="sp"></div><div class="row"><div style="flex:1">{btn("다시 답변하기", "F-2", "g")}</div><div style="flex:1">{btn("대화 계속 보기", "F-3")}</div></div>""",
+    title=f"{CHILD}과 대화", back=True, back_to="F-2")
 
-add(M_F, "F-6", "2단계 대화 (대화 확장하기)",
-    f"일상 상황으로 표현을 확장하며 부모·{CHILD}(AI, 아이 역할)가 각 5회씩 총 10개 발화를 주고받는 대화. 끝나면 자동 종료 후 대화 마무리로 이동",
-    "F-2 1단계 대화 자동 종료 후 '2단계 대화 시작하기'",
-    ["10개 발화 완료 시 자동 종료 → F-5 (대화 마무리)", "답변 대기 → F-3", "입력 실패 → F-4"],
-    f"""<div class="row"><span class="chip">오늘의 표현 · {W}</span><span class="chip on">2단계</span></div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>민준아, 내일 어린이집 소풍 가지? 기분이 어때?</div>
-<div class="bub me">소풍 간다니까 너무 신나! 전날 밤에 잠도 설칠 것 같아.</div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>맞아! 나도 소풍 가기 전날엔 가슴이 콩닥콩닥해!</div>
-<div class="bub me">민준이도 소풍 가기 전엔 마음이 {W}하지?</div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>응! 나도 {W}해! 근데 {W}이랑 콩닥콩닥은 뭐가 달라?</div>
-<div class="bub me">{W}은 조금 더 크게 뛰는 느낌이고, 콩닥콩닥은 더 작고 귀엽게 뛰는 느낌이야.</div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>아하! 그럼 나 오늘 밤에 가슴이 {W}하겠다!</div>
-<div class="bub me">맞아, 내일 소풍 생각하면 오늘 밤부터 {W}할 거야.</div>
-<div class="bub ai"><div class="who">{CHILD} (아이)</div>엄마도 어릴 때 소풍 가기 전에 {W}했어?</div>
-<div class="bub me">그럼! 엄마도 지금도 설레는 일이 있으면 {W}해!</div>
-{banner("2단계 대화까지 모두 마쳤어요 (10개 발화 완료) — 대화가 자동으로 종료돼요", "ok")}
-<div class="floatbar">{btn("대화 마무리 보기 →", "F-5")}</div>""",
-    title=f"{CHILD}과 대화 · 2단계", back=True, back_to="F-2")
-
-add(M_F, "F-5", "대화 마무리",
-    "1·2단계 대화를 모두 마쳤다는 완료 상태만 짧게 보여주고 홈으로 복귀", "F-6 '대화 마무리 보기' (2단계 자동 종료 후)",
-    ["홈으로 → B-1"],
+add(M_F, "F-6", "대화 마무리",
+    "1단계 대화를 마쳤다는 완료 상태만 짧게 보여주고 홈으로 복귀", "F-3 '대화 마무리 보기'", ["홈으로 → B-1"],
     f"""<div class="sp"></div>{ph("완료 일러스트", 90)}<div class="big" style="text-align:center;font-size:17px">오늘 대화 잘했어요!</div>
 <div class="sp"></div>{btn("홈으로", "B-1")}<div class="sp"></div>""",
-    title="대화 마무리",
-    status=["완료 일러스트 · '잘했어요!' 문구 · 홈으로 버튼만 남기고 나머지(쓴 표현 요약, 단계별 카드, 복습·다른 그림책 버튼) 모두 제거"])
+    title="대화 마무리")
 
 # ── G 복습 ──────────────────────────────────────────────────────────────────
 add(M_G, "G-1", "학습 단어 목록",
     "단어 카드에서 🔖 책갈피한 단어만, C-7과 같은 2열 카드(사진·사전적 의미·외국어 뜻)로 모아서 다시 찾아보고 재연습. 기본은 최신 책갈피 순",
-    "하단 탭 '복습' / F-5",
+    "하단 탭 '복습' / F-6",
     ["단어 선택 → G-3 단어별 기록"],
     f"""<div class="muted">🔖 책갈피한 단어 (최신순)</div>
 <div class="grid2">{word_card("dgdg-g1", W, "가슴이 자꾸 세게 뛰는 모양", "Tim đập thình thịch", True, "G-3")}{word_card("pd-g1", "퐁당", "작은 물건이 물에 빠질 때 나는 소리", "Tõm", True, "G-3")}
