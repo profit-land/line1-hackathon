@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Design Collab - 화면 시안 협업</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="/static/style.css">
 <style>
 /* 처리할 작업 이동 하이라이트 — 연한 네온 보라 테두리만(살짝 깜빡임), 2초 */
 @keyframes neon-pulse {
@@ -264,6 +264,15 @@ let state = {
   users: [],   // 팀원 목록 — @명령 자동완성용
 };
 
+let initialPageQueryPending = true;
+
+function pageIdFromUrl() {
+  const raw = new URLSearchParams(window.location.search).get('page');
+  if (!raw || !/^\d+$/.test(raw)) return null;
+  const id = Number(raw);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
 // ─── DOM refs ──────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const projectListEl = $('projectList');
@@ -275,6 +284,8 @@ const previewTitle = $('previewTitle');
 const commentsList = $('commentsList');
 const tagsListEl = $('tagsList');
 const previewBody = $('previewBody');
+
+previewFrame.addEventListener('load', bindPreviewContentScroll);
 
 // ─── Auth (로그인/가입) ─────────────────────────────────────────────────────
 function currentUserEmail() { return state.currentUser ? state.currentUser.email : ''; }
@@ -670,6 +681,8 @@ async function deleteProject(pid) {
 // ─── Pages ─────────────────────────────────────────────────────────────────
 async function loadPages() {
   if (!state.currentProjectId) { state.pages = []; state.menus = []; renderPages(); return; }
+  const requestedPageId = initialPageQueryPending ? pageIdFromUrl() : null;
+  initialPageQueryPending = false;
   const [pages, menus] = await Promise.all([
     api(`/api/projects/${state.currentProjectId}/pages`),
     api(`/api/projects/${state.currentProjectId}/menus`),
@@ -679,7 +692,10 @@ async function loadPages() {
   renderPages();
   // Auto-select first page
   if (state.pages.length > 0 && !state.currentPageId) {
-    selectPage(state.pages[0].id);
+    const requestedPage = requestedPageId == null
+      ? null
+      : state.pages.find(page => page.id === requestedPageId);
+    selectPage((requestedPage || state.pages[0]).id);
   }
 }
 
@@ -1949,8 +1965,7 @@ function renderTagMarkers() {
     const marker = document.createElement('div');
     marker.className = 'tag-marker' + (state.tagMode ? ' tag-mode-active' : '');
     marker.dataset.tagId = tag.id;
-    marker.style.left = tag.x_pct + '%';
-    marker.style.top = tag.y_pct + '%';
+    positionTagMarker(marker, tag);
     marker.textContent = tag.tag_number;
     marker.title = tag.description || `태그 ${tag.tag_number}`;
     marker.addEventListener('mousedown', e => onMarkerMouseDown(e, tag));
@@ -1981,6 +1996,65 @@ function renderTagMarkers() {
     });
     overlay.appendChild(cm);
   });
+}
+
+function getPreviewScrollContentContext() {
+  try {
+    const doc = previewFrame.contentDocument;
+    if (!doc) return null;
+    const candidates = Array.from(doc.querySelectorAll('.content'))
+      .filter(el => el.getClientRects().length && el.scrollHeight > el.clientHeight + 1);
+    const el = candidates.find(node => node.scrollTop > 0) || candidates[0];
+    if (!el) return null;
+    const rect = previewBody.getBoundingClientRect();
+    const frameRect = previewFrame.getBoundingClientRect();
+    const contentRect = el.getBoundingClientRect();
+    return {
+      el,
+      left: frameRect.left + contentRect.left - rect.left,
+      right: frameRect.left + contentRect.right - rect.left,
+      top: frameRect.top + contentRect.top - rect.top,
+      bottom: frameRect.top + contentRect.bottom - rect.top,
+      scrollHeight: el.scrollHeight,
+      scrollTop: el.scrollTop,
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+function positionTagMarker(marker, tag) {
+  const bodyRect = previewBody.getBoundingClientRect();
+  const docY = tag.y_pct / 100 * bodyRect.height;
+  const scroll = getPreviewScrollContentContext();
+  const belongsToScrolledContent = scroll && docY >= scroll.top && docY <= scroll.top + scroll.scrollHeight;
+  const screenY = belongsToScrolledContent ? docY - scroll.scrollTop : docY;
+  marker.style.left = tag.x_pct + '%';
+  marker.style.top = `${screenY}px`;
+  marker.style.visibility = belongsToScrolledContent && (screenY < scroll.top || screenY > scroll.bottom)
+    ? 'hidden'
+    : '';
+}
+
+function syncTagMarkerPositions() {
+  $('tagOverlay').querySelectorAll('.tag-marker:not(.comment-marker)').forEach(marker => {
+    const tag = state.tags.find(item => String(item.id) === marker.dataset.tagId);
+    if (tag) positionTagMarker(marker, tag);
+  });
+}
+
+function bindPreviewContentScroll() {
+  try {
+    const doc = previewFrame.contentDocument;
+    if (!doc) return;
+    if (doc.__tagMarkerScrollBound) return;
+    doc.__tagMarkerScrollBound = true;
+    // scroll events from the prototype's .content panels do not bubble, so listen in capture phase.
+    doc.addEventListener('scroll', syncTagMarkerPositions, { capture: true, passive: true });
+    syncTagMarkerPositions();
+  } catch (e) {
+    // The prototype may not have loaded yet; the next iframe load will bind scrolling.
+  }
 }
 
 // 알림 클릭·마커 클릭 공통: 댓글 탭 전환 후 해당 코멘트로 스크롤 + 가볍게 테두리 강조.
@@ -2317,7 +2391,8 @@ function autoResizeEl(el) {
               out += '\n';
               continue;
             }
-            if (tag === 'UL' || tag === 'OL') { // 목록 컨테이너: 자식만 순회 — LI마다 이미 \n 을 넣으므로 중복 개행 없음
+            if (tag === 'UL' || tag === 'OL') { // 목록 시작도 앞 문장과 분리한다.
+              if (out && out[out.length - 1] !== '\n') out += '\n';
               walk(child, bold);
               continue;
             }
@@ -2924,14 +2999,28 @@ function onPreviewClick(e) {
   if (!state.currentPageId) return;
   // Only respond to clicks on the overlay or iframe area (not on markers themselves)
   if (e.target.closest('.tag-marker')) return;
-  const rect = previewBody.getBoundingClientRect();
-  const xPct = ((e.clientX - rect.left) / rect.width) * 100;
-  const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+  const point = getPreviewPointPercent(e.clientX, e.clientY);
   if (state.commentAddMode) {
-    createCommentAt(xPct, yPct);
+    createCommentAt(point.xPct, point.viewportYPct);
   } else if (state.tagMode) {
-    createTagAt(xPct, yPct);
+    createTagAt(point.xPct, point.yPct);
   }
+}
+
+function getPreviewPointPercent(clientX, clientY) {
+  const rect = previewBody.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  const scroll = getPreviewScrollContentContext();
+  const withinScrollableContent = scroll && x >= scroll.left && x <= scroll.right && y >= scroll.top && y <= scroll.bottom;
+  let documentY = y + (withinScrollableContent ? scroll.scrollTop : 0);
+  if (withinScrollableContent) documentY = Math.min(documentY, scroll.top + scroll.scrollHeight);
+  return {
+    xPct: Math.max(0, Math.min(100, (x / rect.width) * 100)),
+    viewportYPct: Math.max(0, Math.min(100, (y / rect.height) * 100)),
+    // Store the content-space coordinate so the marker follows the same content while it scrolls.
+    yPct: Math.max(0, (documentY / rect.height) * 100),
+  };
 }
 
 function createTagAt(xPct, yPct) {
@@ -3094,19 +3183,16 @@ function onDragMove(e) {
       d.marker.classList.add('dragging');
     }
   }
-  const rect = previewBody.getBoundingClientRect();
-  let xPct = ((e.clientX - rect.left) / rect.width) * 100;
-  let yPct = ((e.clientY - rect.top) / rect.height) * 100;
-  xPct = Math.max(0, Math.min(100, xPct));
-  yPct = Math.max(0, Math.min(100, yPct));
+  const point = getPreviewPointPercent(e.clientX, e.clientY);
+  const xPct = point.xPct;
+  const yPct = d.kind === 'tag' ? point.yPct : point.viewportYPct;
   // 태그인지 코멘트인지 구분
   if (d.kind === 'tag') {
     const tag = state.tags.find(t => t.id === d.id);
     if (!tag) return;
     tag.x_pct = xPct;
     tag.y_pct = yPct;
-    d.marker.style.left = xPct + '%';
-    d.marker.style.top = yPct + '%';
+    positionTagMarker(d.marker, tag);
   } else {
     const c = state.comments.find(x => x.id === d.id);
     if (!c) return;
@@ -3632,6 +3718,12 @@ function fmtToggleBullet(div) {
     for (const n of rangeNodes) {
       if (n.parentNode) n.parentNode.removeChild(n);
     }
+    // The LI's trailing newline separates the list from the next line. Remove the
+    // old single BR after the wrapped line so it does not create a blank row.
+    const brAfterList = ul.nextSibling;
+    if (brAfterList && brAfterList.nodeType === 1 && brAfterList.tagName === 'BR') {
+      brAfterList.remove();
+    }
   }
 }
 // ─── Utility ───────────────────────────────────────────────────────────────
@@ -3650,7 +3742,15 @@ function updateDescEmptyState(div) {
   div.classList.toggle('is-empty', !hasContent);
 }
 
+// A bullet marker is part of its item. Some contenteditable/browser paths leave
+// a BR immediately after the marker, saving `•\nitem`; join that marker to the
+// following text before building either the editor DOM or the read-only view.
+function normalizeBulletLineBreaks(text) {
+  return String(text || '').replace(/(^|\n)•[ \t]*(?:\r?\n)+[ \t]*([^\s])/g, '$1• $2');
+}
+
 function toFmtHtml(text) {
+  text = normalizeBulletLineBreaks(text);
   // <굵게> 마커는 escHtml 전에 보호해야 한다 — escHtml이 <를 &lt;로 바꾸면 치환 불가.
   const protected_ = (text || '')
     .replace(/<굵게>/g, '\x00B\x00')
@@ -3714,7 +3814,9 @@ function fmtDivToPlain(html) {
         if (tag === 'BR') {
           let sib = child.nextSibling;
           while (sib && sib.nodeType === 3 && !/\S/.test(sib.textContent)) sib = sib.nextSibling;
-          const isBlockNext = sib && sib.nodeType === 1 && /^(DIV|P|UL|OL|LI)$/.test(sib.tagName);
+          // DIV/P add their own leading boundary; a list only adds a trailing one.
+          // Keep the BR before UL/OL or the preceding text gets joined to its first bullet.
+          const isBlockNext = sib && sib.nodeType === 1 && /^(DIV|P)$/.test(sib.tagName);
           if (!isBlockNext) out += '\n';
           continue;
         }
@@ -3724,7 +3826,8 @@ function fmtDivToPlain(html) {
           out += '\n';
           continue;
         }
-        if (tag === 'UL' || tag === 'OL') { // 목록 컨테이너: 자식만 순회 — LI마다 이미 \n 을 넣으므로 중복 개행 없음
+        if (tag === 'UL' || tag === 'OL') { // 목록 시작도 앞 문장과 분리한다.
+          if (out && out[out.length - 1] !== '\n') out += '\n';
           walk(child, bold);
           continue;
         }
@@ -3746,7 +3849,7 @@ function fmtDivToPlain(html) {
     }
   };
   walk(doc.body, false);
-  return out
+  return normalizeBulletLineBreaks(out)
     .replace(/[ \t]+\n/g, '\n')   // 줄 끝 공백
     .replace(/(•[^\n]*\n)\n+/g, '$1')
     // [수정] 캐핑 제거 — 엔터 N회 = \n N개가 정확히 보존되어야 한다.
@@ -4001,6 +4104,7 @@ window.addEventListener('blur', () => {
 // 주의: escHtml 전에 마커를 보호 문자로 바꿔야 한다 — escHtml이 <를 &lt;로 바꾸면 치환 불가.
 function fmtToHtml(text, mentionName) {
   if (!text) return '<i>설명 없음</i>';
+  text = normalizeBulletLineBreaks(text);
   const protected_ = text
     .replace(/<굵게>/g, '\x00B\x00')
     .replace(/<\/굵게>/g, '\x00/B\x00');

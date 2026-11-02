@@ -758,7 +758,8 @@ def create_tag(page_id):
         if _u:
             author_name = _u["name"]
     x_pct = max(0.0, min(100.0, x_pct))
-    y_pct = max(0.0, min(100.0, y_pct))
+    # y_pct may exceed 100 when a description is placed lower in a scrollable prototype.
+    y_pct = max(0.0, y_pct)
     rows = _rows("page_tags", page_id=page_id)
     next_num = max((r["tag_number"] for r in rows), default=0) + 1
     tag = _insert("page_tags", {
@@ -786,7 +787,8 @@ def update_tag(tag_id):
     description = data.get("description", tag["description"])
     title = data.get("title", tag["title"] if "title" in tag.keys() else "")
     x_pct = max(0.0, min(100.0, float(x_pct)))
-    y_pct = max(0.0, min(100.0, float(y_pct)))
+    # Keep the page-content coordinate so the marker can follow prototype scrolling.
+    y_pct = max(0.0, float(y_pct))
     # is_resolved: 태그 작성자 또는 디스크립션 작성자가 체크/해제 가능
     if "is_resolved" in data:
         tag_author = (tag["author_email"] or "").lower()
