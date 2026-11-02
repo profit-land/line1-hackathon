@@ -262,24 +262,21 @@ add(M_B, "B-2", "홈 (첫 방문 · 빈 상태)",
     tab="홈", title="안녕하세요, 민준 부모님", status=["기록 없음"])
 
 # ── C 단어 탐색 ─────────────────────────────────────────────────────────────
-def book_card(title, desc, letter):
-    thumb = ph(letter, 56).replace('style="', 'style="width:56px;flex:none;')
-    return card(f'<div class="row">{thumb}<div><h4>{title}</h4><div class="muted">{desc}</div></div></div>', "C-7")
+def book_card(title, letter):
+    return card(f'{ph(letter, 70)}<h4 style="margin-top:8px">{title}</h4>', "C-7")
 
 
 add(M_C, "C-1", "그림책 고르기",
-    "시연용 공공저작물 그림책을 골라 바로 단어 카드 목록으로 이동. 새 그림책은 하단 고정 버튼으로 촬영",
+    "시연용 그림책을 골라 바로 단어 카드 목록으로 이동. 새 그림책은 하단 고정 버튼으로 촬영",
     "B-1 / 하단 탭 '단어 탐색'",
     ["그림책 선택 → C-7 단어 카드 목록", "사진 찍기(하단 고정 버튼) → C-2 촬영"],
-    f"""{book_card("시연용 그림책 A", "공공저작물 · 의성어·의태어 중심", "표지")}
-{book_card("시연용 그림책 B", "공공저작물 · 감정 표현 중심", "표지")}
-{book_card("시연용 그림책 C", "공공저작물 · 관용 표현 중심", "표지")}
+    f"""<div class="grid2">{book_card("시연용 그림책 A", "표지")}{book_card("시연용 그림책 B", "표지")}
+{book_card("시연용 그림책 C", "표지")}</div>
 <div class="floatbar">{btn("그림책 사진 찍기", "C-2")}</div>""",
     tab="단어 탐색", title="그림책 고르기",
-    status=["'찍은 사진은...' 안내 문구 제거", "'사진 찍기' 버튼을 하단 탭 바로 위 고정 플로팅 버튼으로 전환",
-            "'시연용 그림책(공공저작물...)' 안내 문구 제거",
-            "그림책 클릭 시 추출 과정 없이 바로 단어 카드 목록(C-7)으로 이동",
-            "'아이와 대화 연습' 버튼 제거 — 단어 카드(D-1) 안에서만 진입"])
+    status=["책 카드의 '공공저작물·의성어/의태어' 등 설명 문구 전부 제거",
+            "책 카드를 C-7과 같은 2열 그리드 레이아웃으로 전환",
+            "그림책 클릭 시 추출 과정 없이 바로 단어 카드 목록(C-7)으로 이동"])
 
 add(M_C, "C-2", "촬영",
     "한 페이지를 인식하기 좋게 촬영", "C-1 '사진 찍기'",
@@ -354,10 +351,9 @@ add(M_D, "D-1", "단어 카드 상세",
 {card(f'<div class="row" style="justify-content:space-between;align-items:flex-start"><div class="h" style="margin:0">그림책 속 문장</div><span class="ico" title="문장 읽어주기">▶</span></div>{SENT}')}
 <div class="h">비슷한 표현</div>
 <table><tr><th>표현</th><th>느낌</th><th>이럴 때</th></tr>
-<tr><td><b>{W}</b></td><td>보통 세기로 설레요</td><td>선물을 열기 전</td></tr>
-<tr><td><b>콩닥콩닥</b></td><td>작고 귀엽게 뛰어요</td><td>아이·작은 동물</td></tr>
-<tr><td><b>쿵쾅쿵쾅</b></td><td>크고 세게 뛰어요</td><td>크게 놀랐을 때</td></tr></table>
-{card('<h4>차이 한눈에</h4><div class="muted">Tiếng Việt: 두근두근 = hồi hộp vừa phải / 콩닥콩닥 = nhẹ, đáng yêu / 쿵쾅쿵쾅 = mạnh</div>')}
+<tr><td><b>{W}</b></td><td>보통 세기로 설레요<br><span class="muted">hồi hộp vừa phải</span></td><td>선물을 열기 전</td></tr>
+<tr><td><b>콩닥콩닥</b></td><td>작고 귀엽게 뛰어요<br><span class="muted">nhẹ, đáng yêu</span></td><td>아이·작은 동물</td></tr>
+<tr><td><b>쿵쾅쿵쾅</b></td><td>크고 세게 뛰어요<br><span class="muted">mạnh</span></td><td>크게 놀랐을 때</td></tr></table>
 <div class="h">아이에게는 이렇게</div>
 {card('''<h4>① 말풍선처럼 확장해서 말해요</h4>
 <div class="muted">아이가 "토끼!"라고 하면</div>
