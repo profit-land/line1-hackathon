@@ -1,3 +1,6 @@
 .idea/
 .DS_Store
 backend/uploads/
+
+booktalk-design-handoff/
+*.patch
