@@ -1,3 +1,7 @@
 .idea/
 .DS_Store
 backend/uploads/
+
+# 디자인 전달 자료·패치 (로컬 참고용, 커밋 제외)
+booktalk-design-handoff/
+*.patch
